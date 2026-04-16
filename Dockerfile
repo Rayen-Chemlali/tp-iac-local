@@ -1,0 +1,24 @@
+FROM alpine:latest
+RUN apk update && apk add nginx && mkdir -p /run/nginx
+
+# On crée manuellement le fichier de configuration Nginx
+# On lui dit explicitement de chercher dans /var/www/localhost/htdocs
+RUN echo 'server { \
+    listen 80; \
+    root /var/www/localhost/htdocs; \
+    index index.html; \
+    location / { \
+        try_files $uri $uri/ =404; \
+    } \
+}' > /etc/nginx/http.d/default.conf
+
+
+
+# On crée le dossier et le fichier HTML
+RUN mkdir -p /var/www/localhost/htdocs && \
+    echo "<h1>Application Deployed via Terraform IaC (Lab Version)!</h1>" > /var/www/localhost/htdocs/index.html
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
+
